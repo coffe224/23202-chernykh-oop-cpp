@@ -1,9 +1,10 @@
-#include "../include/FileReader.h"
-#include "../include/Parser.h"
-#include "../include/Statistics.h"
-#include "../include/FileWriter.h"
+#include "FileReader/FileReader.h"
+#include "Parser/Parser.h"
+#include "Statistics/Statistics.h"
+#include "FileWriter/FileWriter.h"
 
 #include <iostream>
+#include <cassert>
 
 int main(int argc, char const *argv[])
 {
@@ -21,9 +22,8 @@ int main(int argc, char const *argv[])
     std::string line;
     while (!file_reader.isEOF()) {
         file_reader.getLine(line);
-        std::cout << line << '\n';
+
         parser.parseLine(line, words_list);
-        std::cout << "line was parsed!" << '\n';
 
         statistics.countList(words_list);
 
@@ -31,8 +31,6 @@ int main(int argc, char const *argv[])
         line.clear();
     }
     file_reader.closeFile(); 
-
-    statistics.printMap();
     
     auto words_statistics = statistics.returnStatistics();
 
@@ -52,7 +50,5 @@ int main(int argc, char const *argv[])
 
     file_reader.closeFile();
     
-    std::cout << "done!" << '\n';
-
     return 0;
 }
