@@ -6,7 +6,8 @@ set(HEADERS
     src/FileWriter/FileWriter.h
     src/Parser/Parser.h
     src/Statistics/Statistics.h
-    # src/Controller/Controller.h
+    src/Converter/Converter.h
+    src/Controller/Controller.h
 )
 
 set(SOURCES
@@ -14,7 +15,8 @@ set(SOURCES
     src/FileWriter/FileWriter.cpp
     src/Parser/Parser.cpp
     src/Statistics/Statistics.cpp
-    # src/Controller/Controller.cpp
+    src/Converter/Converter.cpp
+    src/Controller/Controller.cpp
 )
 
 add_executable(test src/main.cpp ${SOURCES} ${HEADERS})
