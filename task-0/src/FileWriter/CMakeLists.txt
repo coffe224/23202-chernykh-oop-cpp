@@ -1,0 +1,1 @@
+add_library(FileWriter FileWriter.cpp FileWriter.h)
