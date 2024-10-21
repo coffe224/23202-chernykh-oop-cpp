@@ -1,12 +1,14 @@
+#include "../Converter/Converter.h"
 #include "../FileReader/FileReader.h"
+#include "../FileWriter/FileWriter.h"
 #include "../Parser/Parser.h"
 #include "../Statistics/Statistics.h"
-#include "../FileWriter/FileWriter.h"
-#include "../Converter/Converter.h"
 
-class Controller {
+class Controller
+{
     public:
-        void CountWords(std::string& input_filename, std::string& output_filename);
+        void CountWords(const std::string& input_filename,
+                        const std::string& output_filename);
 
     private:
         FileReader fileReader;

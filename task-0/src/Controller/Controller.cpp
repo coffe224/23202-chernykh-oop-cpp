@@ -1,7 +1,14 @@
 #include "Controller.h"
+#include <iostream>
 
-void Controller::CountWords(std::string& input_filename, std::string& output_filename) {
+void Controller::CountWords(const std::string& input_filename,
+                            const std::string& output_filename)
+{
     fileReader.openFile(input_filename);
+    if (!fileReader.isOpen()) {
+        std::cout << "Wrong input filename" << '\n';
+        return;
+    }
 
     while (!fileReader.isEOF()) {
         fileReader.getLine(lineOfFile);
@@ -11,11 +18,15 @@ void Controller::CountWords(std::string& input_filename, std::string& output_fil
         wordsList.clear();
         lineOfFile.clear();
     }
-    fileReader.closeFile(); 
-    
+    fileReader.closeFile();
+
     auto words_statistics = statistics.returnStatistics();
 
     fileWriter.openFile(output_filename);
+    if (!fileWriter.isOpen()) {
+        std::cout << "Wrong output filename" << '\n';
+        return;
+    }
 
     for (auto word_info : words_statistics) {
         std::string csv_line = converter.convertTupleToString(word_info, ";");

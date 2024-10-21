@@ -1,11 +1,12 @@
 #include <fstream>
 
-class FileWriter {
+class FileWriter
+{
     public:
-        void openFile(std::string filename);
+        void openFile(const std::string& filename);
         bool isOpen();
         void closeFile();
-        void writeLine(std::string line);
+        void writeLine(const std::string& line);
 
     private:
         std::ofstream file;

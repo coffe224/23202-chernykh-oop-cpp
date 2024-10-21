@@ -1,22 +1,15 @@
 cmake_minimum_required(VERSION 3.6)
-project(task-0-project)
+project(task-0-project LANGUAGES CXX)
 
-set(HEADERS
-    src/FileReader/FileReader.h
-    src/FileWriter/FileWriter.h
-    src/Parser/Parser.h
-    src/Statistics/Statistics.h
-    src/Converter/Converter.h
-    src/Controller/Controller.h
-)
+add_subdirectory(src/Controller)
+add_subdirectory(src/FileReader)
+add_subdirectory(src/FileWriter)
+add_subdirectory(src/Converter)
+add_subdirectory(src/Parser)
+add_subdirectory(src/Statistics)
 
-set(SOURCES
-    src/FileReader/FileReader.cpp
-    src/FileWriter/FileWriter.cpp
-    src/Parser/Parser.cpp
-    src/Statistics/Statistics.cpp
-    src/Converter/Converter.cpp
-    src/Controller/Controller.cpp
-)
+add_subdirectory(Google_tests)
 
-add_executable(test src/main.cpp ${SOURCES} ${HEADERS})
+add_executable(task-0 src/main.cpp)
+target_link_libraries(task-0 Controller)
+

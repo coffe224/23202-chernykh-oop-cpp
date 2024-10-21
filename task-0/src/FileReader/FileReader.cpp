@@ -1,26 +1,32 @@
 #include "FileReader.h"
 
-void FileReader::openFile(std::string& input_filename) {
+void FileReader::openFile(const std::string& input_filename)
+{
     if (!isOpen()) {
         file.open(input_filename);
     }
 }
 
-void FileReader::closeFile() {
+void FileReader::closeFile()
+{
     if (isOpen()) {
         file.close();
     }
 }
 
-bool FileReader::isOpen() const {
-    return file.is_open();
+bool FileReader::isOpen() const { return file.is_open(); }
+
+bool FileReader::isEOF()
+{
+    if (file.is_open()) {
+        return file.peek() == EOF;
+    } else {
+        return true;
+    }
 }
 
-bool FileReader::isEOF() {
-    return file.peek() == EOF;
-}
-
-void FileReader::getLine(std::string& line) {
+void FileReader::getLine(std::string& line)
+{
     if (!isEOF()) {
         std::getline(file, line);
     }

@@ -1,9 +1,10 @@
 #include <fstream>
 #include <string>
 
-class FileReader {
+class FileReader
+{
     public:
-        void openFile(std::string& input_filename);
+        void openFile(const std::string& input_filename);
         bool isOpen() const;
         bool isEOF();
         void closeFile();
