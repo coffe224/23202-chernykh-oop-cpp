@@ -12,4 +12,3 @@ add_subdirectory(Google_tests)
 
 add_executable(task-0 src/main.cpp)
 target_link_libraries(task-0 Controller)
-

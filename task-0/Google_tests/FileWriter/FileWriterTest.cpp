@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <cstdio>
 
 #include "../../src/FileWriter/FileWriter.h"
 
@@ -34,6 +35,7 @@ TEST(FileWriterTestSuiteNormal, OpenFile) {
     ASSERT_EQ(fileWriter.isOpen(), true);
     fileWriter.closeFile();
     ASSERT_EQ(fileWriter.isOpen(), false);
+    ASSERT_EQ(std::remove("WriteExample.csv"), 0);
 }
 
 TEST(FileWriterTestSuiteNormal, WriteToAFile) {
@@ -58,6 +60,8 @@ TEST(FileWriterTestSuiteNormal, WriteToAFile) {
         ASSERT_EQ(message2, check_message2);
 
         check.close();
+
+        ASSERT_EQ(std::remove("WriteExample.csv"), 0);
     } else {
         ASSERT_EQ(1, 0) << "Can't open WriteExample.csv";
     }
