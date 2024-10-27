@@ -3,7 +3,6 @@
 
 #include "../../src/FileWriter/FileWriter.h"
 
-// Initial
 TEST(FileWriterTestSuiteInitial, IsOpenInitial) {
     FileWriter fileWriter;
     ASSERT_EQ(fileWriter.isOpen(), false);
@@ -21,14 +20,12 @@ TEST(FileWriterTestSuiteInitial, WriteLineInitial) {
     ASSERT_EQ(fileWriter.isOpen(), false);
 }
 
-//Wrong Name
 TEST(FileWriterTestSuiteWrongName, OpenWrongFilename) {
     FileWriter fileWriter;
     fileWriter.openFile("");
     ASSERT_EQ(fileWriter.isOpen(), false);
 }
 
-// Normal
 TEST(FileWriterTestSuiteNormal, OpenFile) {
     FileWriter fileWriter;
     fileWriter.openFile("WriteExample.csv");
