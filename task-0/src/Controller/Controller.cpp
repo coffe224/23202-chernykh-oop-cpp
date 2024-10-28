@@ -20,7 +20,8 @@ void Controller::CountWords(const std::string& input_filename,
     }
     fileReader.closeFile();
 
-    auto words_statistics = statistics.returnStatistics();
+    std::vector<std::tuple<std::string, int, double>> words_statistics =
+        statistics.returnStatistics();
 
     fileWriter.openFile(output_filename);
     if (!fileWriter.isOpen()) {
@@ -28,7 +29,7 @@ void Controller::CountWords(const std::string& input_filename,
         return;
     }
 
-    for (auto word_info : words_statistics) {
+    for (std::tuple<std::string, int, double> word_info : words_statistics) {
         std::string csv_line = converter.convertTupleToString(word_info, ";");
         fileWriter.writeLine(csv_line);
     }
