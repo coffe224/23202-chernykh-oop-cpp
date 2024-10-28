@@ -16,8 +16,7 @@ TEST(FileReaderTestSuiteInitial, IsEOFInitial) {
 TEST(FileReaderTestSuiteInitial, GetlineInitial) {
     FileReader fileReader;
     std::string default_line;
-    std::string input_line = default_line;
-    fileReader.getLine(input_line);
+    std::string input_line = fileReader.getLine();
     ASSERT_EQ(default_line, input_line);
 }
 
@@ -80,10 +79,10 @@ TEST(FileReaderTestSuiteEmptyFile, GetlineOnEmptyFile) {
     FileReader fileReader;
     fileReader.openFile("EmptyFile.txt");
 
-    std::string default_line = "something before input";
-    std::string input_line = default_line;
+    std::string default_line;
+    std::string input_line;
     if (fileReader.isOpen()) {
-        fileReader.getLine(input_line);
+        input_line = fileReader.getLine();
         ASSERT_EQ(default_line, input_line);
 
         fileReader.closeFile();
@@ -122,7 +121,7 @@ TEST(FileReaderTestSuiteNormalFile, GetlineOnFile) {
 
     std::string input_line;
     if (fileReader.isOpen()) {
-        fileReader.getLine(input_line);
+        input_line = fileReader.getLine();
         ASSERT_EQ(input_line, message);
 
         fileReader.closeFile();
@@ -146,13 +145,13 @@ TEST(FileReaderTestSuiteNormalFile, FullCycle) {
 
     std::string input_line;
     if (fileReader.isOpen()) {
-        fileReader.getLine(input_line);
+        input_line = fileReader.getLine();
         ASSERT_EQ(input_line, message1);
         ASSERT_EQ(fileReader.isEOF(), false);
 
         input_line.clear();
 
-        fileReader.getLine(input_line);
+        input_line = fileReader.getLine();
         ASSERT_EQ(input_line, message2);
         ASSERT_EQ(fileReader.isEOF(), true);
 

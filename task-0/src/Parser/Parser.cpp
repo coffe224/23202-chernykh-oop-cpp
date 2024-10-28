@@ -1,8 +1,10 @@
 #include "Parser.h"
 #include <iostream>
 
-void Parser::parseLine(std::string &line, std::list<std::string> &parsed_list)
+std::list<std::string> Parser::getWords(std::string& line)
 {
+    std::list<std::string> parsed_words;
+
     wordStartIt = line.begin();
     wordEndIt = line.begin();
     lineEndIt = line.end();
@@ -14,9 +16,11 @@ void Parser::parseLine(std::string &line, std::list<std::string> &parsed_list)
         if (wordStartIt != lineEndIt) {
             std::string word(wordStartIt, wordEndIt);
             lowerWord(word);
-            parsed_list.push_back(word);
+            parsed_words.push_back(word);
         }
     }
+
+    return parsed_words;
 }
 
 bool Parser::isDelim(char l)
@@ -26,7 +30,7 @@ bool Parser::isDelim(char l)
     return is_delim;
 }
 
-void Parser::lowerWord(std::string &word)
+void Parser::lowerWord(std::string& word)
 {
     for (std::string::iterator it = word.begin(); it != word.end(); ++it) {
         if ('A' <= *it && *it <= 'Z') {

@@ -7,16 +7,15 @@ class Statistics
 {
     public:
         Statistics();
-        void countWord(const std::string& word);
-        void countList(const std::list<std::string>& list);
-        void printMap();
-        std::vector<std::tuple<std::string, int, double>> returnStatistics();
+        void put(const std::string& word);
+        void put(const std::list<std::string>& list);
+        std::vector<std::tuple<std::string, int, double>> getStats();
 
     private:
-        void SortStatistics(
+        void sortStats(
             std::vector<std::tuple<std::string, int, double>>& stat_vec);
         static bool
-        CompareTuples(const std::tuple<std::string, int, double>& t1,
+        compareTuples(const std::tuple<std::string, int, double>& t1,
                       const std::tuple<std::string, int, double>& t2);
 
         std::map<std::string, int> wordsMap;

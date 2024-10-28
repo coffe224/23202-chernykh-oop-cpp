@@ -8,7 +8,7 @@ class FileReader
         bool isOpen() const;
         bool isEOF();
         void closeFile();
-        void getLine(std::string& line);
+        std::string getLine();
 
     private:
         std::ifstream file;

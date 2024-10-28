@@ -5,7 +5,7 @@
 
 Statistics::Statistics() { wordsTotal = 0; }
 
-void Statistics::countWord(const std::string& word)
+void Statistics::put(const std::string& word)
 {
     if (wordsMap.find(word) == wordsMap.end()) {
         wordsMap[word] = 1;
@@ -15,23 +15,15 @@ void Statistics::countWord(const std::string& word)
     wordsTotal++;
 }
 
-void Statistics::countList(const std::list<std::string>& words_list)
+void Statistics::put(const std::list<std::string>& words_list)
 {
     std::list<std::string>::const_iterator it;
     for (it = words_list.begin(); it != words_list.end(); it++) {
-        countWord(*it);
+        put(*it);
     }
 }
 
-void Statistics::printMap()
-{
-    std::map<std::string, int>::iterator it;
-    for (it = wordsMap.begin(); it != wordsMap.end(); it++) {
-        std::cout << it->first << " : " << it->second << '\n';
-    }
-}
-
-std::vector<std::tuple<std::string, int, double>> Statistics::returnStatistics()
+std::vector<std::tuple<std::string, int, double>> Statistics::getStats()
 {
     size_t unique_words = wordsMap.size();
 
@@ -49,17 +41,17 @@ std::vector<std::tuple<std::string, int, double>> Statistics::returnStatistics()
         *vec_it = word_info;
     }
 
-    SortStatistics(statistics_vector);
+    sortStats(statistics_vector);
     return statistics_vector;
 }
 
-void Statistics::SortStatistics(
+void Statistics::sortStats(
     std::vector<std::tuple<std::string, int, double>>& stat_vec)
 {
-    std::sort(stat_vec.begin(), stat_vec.end(), CompareTuples);
+    std::sort(stat_vec.begin(), stat_vec.end(), compareTuples);
 }
 
-bool Statistics::CompareTuples(const std::tuple<std::string, int, double>& t1,
+bool Statistics::compareTuples(const std::tuple<std::string, int, double>& t1,
                                const std::tuple<std::string, int, double>& t2)
 {
     return std::get<1>(t1) > std::get<1>(t2);

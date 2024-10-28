@@ -5,18 +5,18 @@
 TEST(StatisticsTestSuite, EmptyList) {
     Statistics statistics;
     std::list<std::string> list;
-    statistics.countList(list);
+    statistics.put(list);
     std::vector<std::tuple<std::string, int, double>> words =
-        statistics.returnStatistics();
+        statistics.getStats();
     ASSERT_EQ(words.size(), 0);
 }
 
 TEST(StatisticsTestSuite, EmptyWord) {
     Statistics statistics;
     std::string word;
-    statistics.countWord(word);
+    statistics.put(word);
     std::vector<std::tuple<std::string, int, double>> words =
-        statistics.returnStatistics();
+        statistics.getStats();
     ASSERT_EQ(words.size(), 1);
     ASSERT_EQ(std::get<0>(words[0]), "");
     ASSERT_EQ(std::get<1>(words[0]), 1);
@@ -26,9 +26,9 @@ TEST(StatisticsTestSuite, EmptyWord) {
 TEST(StatisticsTestSuite, NormalWords) {
     Statistics statistics;
     std::list<std::string> list{"meow", "meow", "weom"};
-    statistics.countList(list);
+    statistics.put(list);
     std::vector<std::tuple<std::string, int, double>> words =
-        statistics.returnStatistics();
+        statistics.getStats();
     ASSERT_EQ(words.size(), 2);
 
     ASSERT_EQ(std::get<0>(words[0]), "meow");

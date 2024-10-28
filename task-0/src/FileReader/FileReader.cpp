@@ -25,9 +25,11 @@ bool FileReader::isEOF()
     }
 }
 
-void FileReader::getLine(std::string& line)
+std::string FileReader::getLine()
 {
+    std::string line;
     if (!isEOF()) {
         std::getline(file, line);
     }
+    return line;
 }

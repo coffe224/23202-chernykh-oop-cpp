@@ -4,7 +4,7 @@
 class Parser
 {
     public:
-        void parseLine(std::string &line, std::list<std::string> &parsed_list);
+        std::list<std::string> getWords(std::string& line);
 
     private:
         std::string::iterator wordStartIt;
@@ -12,7 +12,7 @@ class Parser
         std::string::iterator lineEndIt;
 
         bool isDelim(char l);
-        void lowerWord(std::string &word);
+        void lowerWord(std::string& word);
         void findWordStart();
         void findWordEnd();
 };

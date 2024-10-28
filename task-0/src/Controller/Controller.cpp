@@ -11,17 +11,14 @@ void Controller::CountWords(const std::string& input_filename,
     }
 
     while (!fileReader.isEOF()) {
-        fileReader.getLine(lineOfFile);
-        parser.parseLine(lineOfFile, wordsList);
-        statistics.countList(wordsList);
-
-        wordsList.clear();
-        lineOfFile.clear();
+        lineOfFile = fileReader.getLine();
+        wordsList = parser.getWords(lineOfFile);
+        statistics.put(wordsList);
     }
     fileReader.closeFile();
 
     std::vector<std::tuple<std::string, int, double>> words_statistics =
-        statistics.returnStatistics();
+        statistics.getStats();
 
     fileWriter.openFile(output_filename);
     if (!fileWriter.isOpen()) {

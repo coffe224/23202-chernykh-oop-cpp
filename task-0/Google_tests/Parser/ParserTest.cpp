@@ -8,7 +8,7 @@ TEST(ParserTestSuite, EmptyString) {
     std::string line = "";
     std::list<std::string> list;
 
-    parser.parseLine(line, list);
+    list = parser.getWords(line);
     ASSERT_EQ(list.size(), 0);
 }
 
@@ -18,7 +18,7 @@ TEST(ParserTestSuite, DelimeterString) {
     std::string line = "/.,.   /,/,.,/..,  ..!%@&#% &!@#*!&  @^%[]{}((()))";
     std::list<std::string> list;
 
-    parser.parseLine(line, list);
+    list = parser.getWords(line);
     ASSERT_EQ(list.size(), 0);
 }
 
@@ -28,7 +28,7 @@ TEST(ParserTestSuite, WordString) {
     std::string line = "meow.meow...meow  meow!!!!!!!!!meow";
     std::list<std::string> list;
 
-    parser.parseLine(line, list);
+    list = parser.getWords(line);
     ASSERT_EQ(list.size(), 5);
     for (int i = 0; i < 5; i++) {
         ASSERT_EQ(list.back(), "meow");
@@ -42,7 +42,7 @@ TEST(ParserTestSuite, CaseWordString) {
     std::string line = "BIG,big BiG...big";
     std::list<std::string> list;
 
-    parser.parseLine(line, list);
+    list = parser.getWords(line);
     ASSERT_EQ(list.size(), 4);
     for (int i = 0; i < 4; i++) {
         ASSERT_EQ(list.back(), "big");
@@ -56,7 +56,7 @@ TEST(ParserTestSuite, NumberWordString) {
     std::string line = "number1 999 31Number31";
     std::list<std::string> list;
 
-    parser.parseLine(line, list);
+    list = parser.getWords(line);
     ASSERT_EQ(list.size(), 3);
 
     ASSERT_EQ(list.back(), "31number31");
