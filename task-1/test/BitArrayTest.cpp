@@ -1,5 +1,6 @@
 #include "../src/BitArray.h"
 #include <gtest/gtest.h>
+#include <stdexcept>
 
 // ConstructorTestSuite
 TEST(ConstructorTestSuite, DefaultConstructor)
@@ -20,7 +21,7 @@ TEST(ConstructorTestSuite, EmptyExplicitConstructor)
 
 TEST(ConstructorTestSuite, BadExplicitConstructor)
 {
-    EXPECT_THROW(BitArray bitarray(-1), std::length_error);
+    EXPECT_THROW(BitArray bitarray(-1), std::invalid_argument);
 }
 
 TEST(ConstructorTestSuite, DefaultExplicitConstructor)
@@ -217,7 +218,7 @@ TEST(ResizeOperationsTestSuite, NotEmptyClear)
 TEST(ResizeOperationsTestSuite, BadResize)
 {
     BitArray a(15);
-    EXPECT_THROW(a.resize(-1), std::length_error);
+    EXPECT_THROW(a.resize(-1), std::invalid_argument);
 }
 
 TEST(ResizeOperationsTestSuite, ZeroResize)

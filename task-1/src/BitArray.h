@@ -113,9 +113,12 @@ class BitArray
         class Wrapper
         {
             public:
-                int index;
+                Wrapper(BitArray& bitarray, int index);
                 operator bool() const;
-                Wrapper& operator=(bool value);                
+                Wrapper& operator=(bool value);
+            private:
+                BitArray& bitarray; 
+                int index;          
         };
 
         Wrapper& operator[](int i);
@@ -135,13 +138,13 @@ class BitArray
     private:
         int length = 0;
         int blocks = 0;
-        const int bitsInBlock = sizeof(unsigned int) * 8;
+        const int bitsInBlock = sizeof(unsigned long) * 8;
         
         struct Block
         {
             Block* next;
             Block* prev;
-            unsigned int bitHolder;
+            unsigned long bitHolder;
         };
 
         Block* start = NULL;
@@ -152,10 +155,9 @@ class BitArray
 
         void remove(int num_bits);
         void removeLastBlock();
-        int getBitsLastBlock();
-        void addNewBlock();
+        
         void add(int num_bits);
-
+        void addNewBlock();
 };
 
 /// @brief returns if two BitArrays have the same bits

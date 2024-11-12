@@ -1,18 +1,9 @@
 #include "BitArray.h"
 #include <stdexcept>
 
-int BitArray::getBitsLastBlock()
-{
-    if (length % bitsInBlock == 0) {
-        return bitsInBlock;
-    } else {
-        return length % bitsInBlock;
-    }
-}
-
 void BitArray::removeLastBlock()
 {
-    Block* new_end = end->prev;
+    Block *new_end = end->prev;
     delete end;
     end = new_end;
     if (blocks != 1) {
@@ -26,7 +17,7 @@ void BitArray::removeLastBlock()
 
 void BitArray::addNewBlock()
 {
-    Block* new_end = new Block;
+    Block *new_end = new Block;
     new_end->next = NULL;
     new_end->prev = end;
     new_end->bitHolder = 0;
@@ -35,7 +26,7 @@ void BitArray::addNewBlock()
     } else {
         start = new_end;
     }
-    
+
     end = new_end;
     blocks += 1;
 }
@@ -64,16 +55,15 @@ bool BitArray::readBit(int index) const
     int shift = bitsInBlock - index_in_block - 1;
     unsigned int sample = 1;
     sample <<= shift;
-    
+
     int index_of_cur_block = 0;
-    Block* current_block = start;
+    Block *current_block = start;
     while ((index_of_cur_block + 1) * bitsInBlock <= index) {
         current_block = current_block->next;
         index_of_cur_block++;
     }
-    
-    sample &= current_block->bitHolder;
 
+    sample &= current_block->bitHolder;
     if (sample == 0) {
         return false;
     } else {
@@ -88,9 +78,21 @@ void BitArray::changeBit(int index, bool value)
     unsigned int sample = 1;
     sample <<= shift;
 
+    int index_of_cur_block = 0;
+    Block *current_block = start;
+    while ((index_of_cur_block + 1) * bitsInBlock <= index) {
+        current_block = current_block->next;
+        index_of_cur_block++;
+    }
+
+    if (value) {
+        current_block->bitHolder |= sample;
+    } else {
+        current_block->bitHolder &= ~sample;
+    }
 }
 
-BitArray::BitArray() 
+BitArray::BitArray()
 {
     length = 0;
     blocks = 0;
@@ -98,27 +100,26 @@ BitArray::BitArray()
     end = NULL;
 }
 
-BitArray::~BitArray() 
-{
-    clear();
-}
+BitArray::~BitArray() { clear(); }
 
 explicit BitArray::BitArray(int num_bits, unsigned long value)
 {
+    if (num_bits < 0) {
+        throw std::invalid_argument("bad length");
+    }
     if (num_bits == 0) {
         BitArray();
     } else {
         add(num_bits);
         start->bitHolder = value;
     }
-    length = num_bits;
 }
 
 BitArray::BitArray(const BitArray& b)
 {
     length = b.length;
     blocks = b.blocks;
-    Block* current_block_b = b.start;
+    Block *current_block_b = b.start;
     for (int i = 0; i < blocks; i++) {
         addNewBlock();
         end->bitHolder = current_block_b->bitHolder;
@@ -128,12 +129,12 @@ BitArray::BitArray(const BitArray& b)
 
 BitArray& BitArray::operator=(const BitArray& b)
 {
-    BitArray new_bitarray(b); 
+    BitArray new_bitarray(b);
     swap(new_bitarray);
     return *this;
 }
 
-void BitArray::swap(BitArray& b) 
+void BitArray::swap(BitArray& b)
 {
     std::swap(this->length, b.length);
     std::swap(this->blocks, b.blocks);
@@ -158,10 +159,7 @@ void BitArray::resize(int num_bits, bool value)
     }
 }
 
-void BitArray::clear()
-{
-    remove(length);
-}
+void BitArray::clear() { remove(length); }
 
 void BitArray::push_back(bool bit)
 {
@@ -202,10 +200,65 @@ BitArray& BitArray::operator^=(const BitArray& b)
     return *this;
 }
 
+BitArray& BitArray::operator<<=(int n)
+{
+    if (n < 0) {
+        throw std::invalid_argument("bad shift");
+    } else if (n == 0) {
+        return *this;
+    }
+
+    for (int i = 0; i < length - n; i++) {
+        bool bit = readBit(i + n);
+        changeBit(i, bit);
+    }
+
+    for (int i = length - n; i < length; i++) {
+        changeBit(i, false);
+    }
+}
+
+BitArray& BitArray::operator>>=(int n)
+{
+    if (n < 0) {
+        throw std::invalid_argument("bad shift");
+    } else if (n == 0) {
+        return *this;
+    }
+
+    for (int i = length - n - 1; i >= 0; i--) {
+        bool bit = readBit(i);
+        changeBit(i + n, bit);
+    }
+
+    for (int i = 0; i < n; i++) {
+        changeBit(i, false);
+    }
+}
+
+// переполнение n?
+BitArray BitArray::operator<<(int n) const
+{
+    if (n < 0) {
+        throw std::invalid_argument("bad shift");
+    }
+    BitArray new_bitarray(*this);
+    new_bitarray <<= n;
+}
+
+BitArray BitArray::operator>>(int n) const
+{
+    if (n < 0) {
+        throw std::invalid_argument("bad shift");
+    }
+    BitArray new_bitarray(*this);
+    new_bitarray <<= n;
+}
+
 BitArray& BitArray::set(int n, bool val)
 {
     if (n < 0 || n > length - 1) {
-        throw std::invalid_argument("bad index");
+        throw std::out_of_range("bad index");
     }
     changeBit(n, val);
     return *this;
@@ -222,7 +275,7 @@ BitArray& BitArray::set()
 BitArray& BitArray::reset(int n)
 {
     if (n < 0 || n > length - 1) {
-        throw std::invalid_argument("bad index");
+        throw std::out_of_range("bad index");
     }
     changeBit(n, false);
     return *this;
@@ -274,19 +327,29 @@ int BitArray::count() const
 bool BitArray::operator[](int i) const
 {
     if (i < 0 || i > length - 1) {
-        throw std::invalid_argument("bad index");
+        throw std::out_of_range("bad index");
     }
 
     return readBit(i);
 }
 
+BitArray::Wrapper::Wrapper(BitArray& bitarray, int index)
+    : bitarray(bitarray), index(index) {}
+
+BitArray::Wrapper::operator bool() const { return bitarray.readBit(index); }
+
+BitArray::Wrapper& BitArray::Wrapper::operator=(bool value)
+{
+    bitarray.changeBit(index, value);
+    return *this;
+}
+
 BitArray::Wrapper& BitArray::operator[](int i)
 {
     if (i < 0 || i > length - 1) {
-        throw std::invalid_argument("bad index");
+        throw std::out_of_range("bad index");
     }
-    Wrapper wrapper;
-    wrapper.index = i;
+    Wrapper wrapper(*this, i);
 
     return wrapper;
 }
