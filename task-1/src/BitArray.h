@@ -2,6 +2,42 @@
 
 class BitArray
 {
+    private:
+        int length = 0;
+        int blocks = 0;
+        const int bitsInBlock = sizeof(unsigned long) * 8;
+
+        struct Block {
+                Block *next;
+                Block *prev;
+                unsigned long bitHolder;
+        };
+
+        Block *start = NULL;
+        Block *end = NULL;
+        
+        
+        class Wrapper
+        {
+            public:
+                Wrapper(int index, BitArray& bitarray);
+                operator bool() const;
+                Wrapper operator=(bool value);
+            private:
+                int index;
+                BitArray& bitarray;
+        };
+
+
+        bool readBit(int index) const;
+        void changeBit(int index, bool value);
+
+        void remove(int num_bits);
+        void removeLastBlock();
+
+        void add(int num_bits);
+        void addNewBlock();
+
     public:
         BitArray();
         ~BitArray();
@@ -62,12 +98,14 @@ class BitArray
         /// @return this BitArray
         BitArray& operator>>=(int n);
 
-        /// @brief creates new BitArray with shifted to the left bits, new bits are 0
+        /// @brief creates new BitArray with shifted to the left bits, new bits
+        /// are 0
         /// @param n shift
         /// @return shifted BitArray
         BitArray operator<<(int n) const;
 
-        /// @brief creates new BitArray with shifted to the right bits, new bits are 0
+        /// @brief creates new BitArray with shifted to the right bits, new bits
+        /// are 0
         /// @param n shift
         /// @return shifted BitArray
         BitArray operator>>(int n) const;
@@ -110,18 +148,7 @@ class BitArray
         bool operator[](int i) const;
 
         /// @brief wrapper class for index operations
-        class Wrapper
-        {
-            public:
-                Wrapper(BitArray& bitarray, int index);
-                operator bool() const;
-                Wrapper& operator=(bool value);
-            private:
-                BitArray& bitarray; 
-                int index;          
-        };
-
-        Wrapper& operator[](int i);
+        Wrapper operator[](int i);
 
         /// @brief returns number of bits in BitArray
         /// @return length of BitArray in bits
@@ -134,30 +161,6 @@ class BitArray
         /// @brief returns BitArray as string of '0' and '1'
         /// @return string of '0' and '1' of a size() length
         std::string to_string() const;
-
-    private:
-        int length = 0;
-        int blocks = 0;
-        const int bitsInBlock = sizeof(unsigned long) * 8;
-        
-        struct Block
-        {
-            Block* next;
-            Block* prev;
-            unsigned long bitHolder;
-        };
-
-        Block* start = NULL;
-        Block* end = NULL;
-
-        bool readBit(int index) const;
-        void changeBit(int index, bool value);
-
-        void remove(int num_bits);
-        void removeLastBlock();
-        
-        void add(int num_bits);
-        void addNewBlock();
 };
 
 /// @brief returns if two BitArrays have the same bits
