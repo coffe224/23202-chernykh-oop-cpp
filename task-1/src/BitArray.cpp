@@ -267,7 +267,6 @@ BitArray& BitArray::operator>>=(int n)
     return *this;
 }
 
-// переполнение n?
 BitArray BitArray::operator<<(int n) const
 {
     if (n < 0) {

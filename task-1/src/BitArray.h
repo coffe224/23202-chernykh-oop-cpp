@@ -3,39 +3,59 @@
 class BitArray
 {
     private:
+        // length in bits
         int length = 0;
+
+        // how many blocks of bits
         int blocks = 0;
         const int bitsInBlock = sizeof(unsigned long) * 8;
 
         struct Block {
-                Block *next;
-                Block *prev;
-                unsigned long bitHolder;
+            Block *next;
+            Block *prev;
+            unsigned long bitHolder;
         };
 
+        // pointer to first block
         Block *start = NULL;
+
+        // pointer to last block
         Block *end = NULL;
-        
-        
+
         class Wrapper
         {
             public:
                 Wrapper(int index, BitArray& bitarray);
                 operator bool() const;
                 Wrapper operator=(bool value);
+
             private:
                 int index;
                 BitArray& bitarray;
         };
 
-
+        /// @brief gets bit of some index
+        /// @param index index of bit to get
+        /// @return true if bit is 1; false otherwise
         bool getBit(int index) const;
+
+        /// @brief sets bit of some index
+        /// @param index index of bit to set
+        /// @param value value to set bit
         void setBit(int index, bool value);
 
+        /// @brief removes bits from the end
+        /// @param num_bits number of bits to remove
         void remove(int num_bits);
+
+        /// @brief removes last block from the end of BitArray
         void removeLastBlock();
 
+        /// @brief adds bits to the end of BitArray
+        /// @param num_bits number of bits to add
         void add(int num_bits);
+
+        /// @brief adds new block to the end of BitArray
         void addNewBlock();
 
     public:
@@ -145,8 +165,14 @@ class BitArray
         /// @return amount of true bits in BitArray
         int count() const;
 
+        /// @brief gets bit of some index
+        /// @param i index of bit to get
+        /// @return bool value of bit
         bool operator[](int i) const;
 
+        /// @brief sets bit of some index
+        /// @param i index of bit to set
+        /// @return wrapper object
         Wrapper operator[](int i);
 
         /// @brief returns number of bits in BitArray
