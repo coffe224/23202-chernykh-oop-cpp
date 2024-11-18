@@ -12,7 +12,6 @@ void BitArray::removeLastBlock()
     } else {
         start = NULL;
     }
-
     blocks--;
 }
 
@@ -27,13 +26,15 @@ void BitArray::addNewBlock()
     } else {
         end->next = new_end;
     }
-
     end = new_end;
     blocks++;
 }
 
 void BitArray::add(int num_bits)
 {
+    if (num_bits < 0) {
+        throw std::invalid_argument("bad length");
+    }
     int new_length = length + num_bits;
     while (blocks * bitsInBlock < new_length) {
         addNewBlock();
@@ -43,6 +44,9 @@ void BitArray::add(int num_bits)
 
 void BitArray::remove(int num_bits)
 {
+    if (num_bits<0 | num_bits> length) {
+        throw std::invalid_argument("bad length");
+    }
     int new_length = length - num_bits;
     while (blocks != 0 && (blocks - 1) * bitsInBlock >= new_length) {
         removeLastBlock();
@@ -50,8 +54,11 @@ void BitArray::remove(int num_bits)
     length = new_length;
 }
 
-bool BitArray::readBit(int index) const
+bool BitArray::getBit(int index) const
 {
+    if (index<0 | index> length - 1) {
+        throw std::out_of_range("bad index");
+    }
     int index_in_block = index % bitsInBlock;
     int shift = bitsInBlock - index_in_block - 1;
     unsigned long sample = 1;
@@ -65,15 +72,14 @@ bool BitArray::readBit(int index) const
     }
 
     sample &= current_block->bitHolder;
-    if (sample == 0) {
-        return false;
-    } else {
-        return true;
-    }
+    return sample;
 }
 
-void BitArray::changeBit(int index, bool value)
+void BitArray::setBit(int index, bool value)
 {
+    if (index<0 | index> length - 1) {
+        throw std::out_of_range("bad index");
+    }
     int index_in_block = index % bitsInBlock;
     int shift = bitsInBlock - index_in_block - 1;
     unsigned long sample = 1;
@@ -93,6 +99,17 @@ void BitArray::changeBit(int index, bool value)
     }
 }
 
+BitArray::Wrapper::Wrapper(int index, BitArray& bitarray)
+    : index(index), bitarray(bitarray) {}
+
+BitArray::Wrapper::operator bool() const { return bitarray.getBit(index); }
+
+BitArray::Wrapper BitArray::Wrapper::operator=(bool value)
+{
+    bitarray.setBit(index, value);
+    return *this;
+}
+
 BitArray::BitArray()
 {
     length = 0;
@@ -105,21 +122,20 @@ BitArray::~BitArray() { clear(); }
 
 BitArray::BitArray(int num_bits, unsigned long value)
 {
-    if (num_bits < 0) {
-        throw std::invalid_argument("bad length");
-    }
-
-    BitArray();
-    if (num_bits != 0) {
-        add(num_bits);
-        start->bitHolder = value;
+    try {
+        BitArray();
+        if (num_bits != 0) {
+            add(num_bits);
+            start->bitHolder = value;
+        }
+    } catch (std::exception& ex) {
+        throw;
     }
 }
 
 BitArray::BitArray(const BitArray& b)
 {
     BitArray();
-    length = b.length;
 
     Block *current_block_b = b.start;
     for (int i = 0; i < b.blocks; i++) {
@@ -127,6 +143,7 @@ BitArray::BitArray(const BitArray& b)
         end->bitHolder = current_block_b->bitHolder;
         current_block_b = current_block_b->next;
     }
+    length = b.length;
 }
 
 BitArray& BitArray::operator=(const BitArray& b)
@@ -150,12 +167,11 @@ void BitArray::resize(int num_bits, bool value)
         throw std::invalid_argument("bad length");
     }
     if (num_bits > length) {
-
         int old_length = length;
         add(num_bits - old_length);
 
         for (int i = old_length; i < length; i++) {
-            changeBit(i, value);
+            setBit(i, value);
         }
     } else if (num_bits < length) {
         remove(length - num_bits);
@@ -167,7 +183,7 @@ void BitArray::clear() { remove(length); }
 void BitArray::push_back(bool bit)
 {
     add(1);
-    changeBit(length - 1, bit);
+    setBit(length - 1, bit);
 }
 
 BitArray& BitArray::operator&=(const BitArray& b)
@@ -176,7 +192,7 @@ BitArray& BitArray::operator&=(const BitArray& b)
         throw std::length_error("BitArrays have different size");
     }
     for (int i = 0; i < length; i++) {
-        changeBit(i, readBit(i) & b[i]);
+        setBit(i, getBit(i) & b[i]);
     }
     return *this;
 }
@@ -187,7 +203,7 @@ BitArray& BitArray::operator|=(const BitArray& b)
         throw std::length_error("BitArrays have different size");
     }
     for (int i = 0; i < length; i++) {
-        changeBit(i, readBit(i) | b[i]);
+        setBit(i, getBit(i) | b[i]);
     }
     return *this;
 }
@@ -198,7 +214,7 @@ BitArray& BitArray::operator^=(const BitArray& b)
         throw std::length_error("BitArrays have different size");
     }
     for (int i = 0; i < length; i++) {
-        changeBit(i, readBit(i) ^ b[i]);
+        setBit(i, getBit(i) ^ b[i]);
     }
     return *this;
 }
@@ -217,12 +233,12 @@ BitArray& BitArray::operator<<=(int n)
     }
 
     for (int i = 0; i < length - n; i++) {
-        bool bit = readBit(i + n);
-        changeBit(i, bit);
+        bool bit = getBit(i + n);
+        setBit(i, bit);
     }
 
     for (int i = length - n; i < length; i++) {
-        changeBit(i, false);
+        setBit(i, false);
     }
     return *this;
 }
@@ -241,12 +257,12 @@ BitArray& BitArray::operator>>=(int n)
     }
 
     for (int i = length - n - 1; i >= 0; i--) {
-        bool bit = readBit(i);
-        changeBit(i + n, bit);
+        bool bit = getBit(i);
+        setBit(i + n, bit);
     }
 
     for (int i = 0; i < n; i++) {
-        changeBit(i, false);
+        setBit(i, false);
     }
     return *this;
 }
@@ -277,14 +293,14 @@ BitArray& BitArray::set(int n, bool val)
     if (n < 0 || n > length - 1) {
         throw std::out_of_range("bad index");
     }
-    changeBit(n, val);
+    setBit(n, val);
     return *this;
 }
 
 BitArray& BitArray::set()
 {
     for (int i = 0; i < length; i++) {
-        changeBit(i, true);
+        setBit(i, true);
     }
     return *this;
 }
@@ -294,14 +310,14 @@ BitArray& BitArray::reset(int n)
     if (n < 0 || n > length - 1) {
         throw std::out_of_range("bad index");
     }
-    changeBit(n, false);
+    setBit(n, false);
     return *this;
 }
 
 BitArray& BitArray::reset()
 {
     for (int i = 0; i < length; i++) {
-        changeBit(i, false);
+        setBit(i, false);
     }
     return *this;
 }
@@ -310,7 +326,7 @@ bool BitArray::any() const
 {
     bool result = false;
     for (int i = 0; i < length; i++) {
-        if (readBit(i)) {
+        if (getBit(i)) {
             result = true;
             break;
         }
@@ -324,7 +340,7 @@ BitArray BitArray::operator~() const
 {
     BitArray result(length);
     for (int i = 0; i < length; i++) {
-        result.changeBit(i, !readBit(i));
+        result.setBit(i, !getBit(i));
     }
     return result;
 }
@@ -333,7 +349,7 @@ int BitArray::count() const
 {
     int counter = 0;
     for (int i = 0; i < length; i++) {
-        if (readBit(i)) {
+        if (getBit(i)) {
             counter++;
         }
     }
@@ -343,22 +359,11 @@ int BitArray::count() const
 
 bool BitArray::operator[](int i) const
 {
-    if (i < 0 || i > length - 1) {
-        throw std::out_of_range("bad index");
+    try {
+        return getBit(i);
+    } catch (std::exception& ex) {
+        throw;
     }
-
-    return readBit(i);
-}
-
-BitArray::Wrapper::Wrapper(int index, BitArray& bitarray)
-    : index(index), bitarray(bitarray) {}
-
-BitArray::Wrapper::operator bool() const { return bitarray.readBit(index); }
-
-BitArray::Wrapper BitArray::Wrapper::operator=(bool value)
-{
-    bitarray.changeBit(index, value);
-    return *this;
 }
 
 BitArray::Wrapper BitArray::operator[](int i)
@@ -378,7 +383,7 @@ std::string BitArray::to_string() const
 {
     std::string result(length, '0');
     for (int i = 0; i < length; i++) {
-        if (readBit(i)) {
+        if (getBit(i)) {
             result[i] = '1';
         }
     }
@@ -387,32 +392,35 @@ std::string BitArray::to_string() const
 
 BitArray operator&(const BitArray& b1, const BitArray& b2)
 {
-    if (b1.size() != b2.size()) {
-        throw std::length_error("BitArrays have different size");
+    try {
+        BitArray result(b1);
+        result &= b2;
+        return result;
+    } catch (std::exception& ex) {
+        throw;
     }
-    BitArray result(b1);
-    result &= b2;
-    return result;
 }
 
 BitArray operator|(const BitArray& b1, const BitArray& b2)
 {
-    if (b1.size() != b2.size()) {
-        throw std::length_error("BitArrays have different size");
+    try {
+        BitArray result(b1);
+        result |= b2;
+        return result;
+    } catch (std::exception& ex) {
+        throw;
     }
-    BitArray result(b1);
-    result |= b2;
-    return result;
 }
 
 BitArray operator^(const BitArray& b1, const BitArray& b2)
 {
-    if (b1.size() != b2.size()) {
-        throw std::length_error("BitArrays have different size");
+    try {
+        BitArray result(b1);
+        result ^= b2;
+        return result;
+    } catch (std::exception& ex) {
+        throw;
     }
-    BitArray result(b1);
-    result ^= b2;
-    return result;
 }
 
 bool operator==(const BitArray& a, const BitArray& b)
@@ -430,4 +438,11 @@ bool operator==(const BitArray& a, const BitArray& b)
     return is_equal;
 }
 
-bool operator!=(const BitArray& a, const BitArray& b) { return !(a == b); }
+bool operator!=(const BitArray& a, const BitArray& b)
+{
+    try {
+        return !(a == b);
+    } catch (std::exception& ex) {
+        throw;
+    }
+}

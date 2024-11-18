@@ -29,8 +29,8 @@ class BitArray
         };
 
 
-        bool readBit(int index) const;
-        void changeBit(int index, bool value);
+        bool getBit(int index) const;
+        void setBit(int index, bool value);
 
         void remove(int num_bits);
         void removeLastBlock();
@@ -147,7 +147,6 @@ class BitArray
 
         bool operator[](int i) const;
 
-        /// @brief wrapper class for index operations
         Wrapper operator[](int i);
 
         /// @brief returns number of bits in BitArray
