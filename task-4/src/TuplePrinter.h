@@ -8,7 +8,6 @@ typename std::enable_if_t<M == sizeof...(Args), std::basic_ostream<Ch, Tr>&>
     return os;
 }
 
-
 template <std::size_t M = 0, typename Ch, typename Tr, typename... Args>
 typename std::enable_if_t<M < sizeof...(Args), std::basic_ostream<Ch, Tr>&>
     operator<<(std::basic_ostream<Ch, Tr>& os, std::tuple<Args...> const& t)
@@ -19,4 +18,3 @@ typename std::enable_if_t<M < sizeof...(Args), std::basic_ostream<Ch, Tr>&>
     }
     return operator<<<M + 1, Ch, Tr, Args...>(os, t);
 }
-
