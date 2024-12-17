@@ -28,7 +28,6 @@ int main(int argc, char const *argv[])
         if (arg_parser.getOptArgs("help") != "") {
             throw;
         }
-        std::cout << "help message" << "\n";
         return 0;
     }
 

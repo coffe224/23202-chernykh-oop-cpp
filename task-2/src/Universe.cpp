@@ -26,12 +26,12 @@ void Universe::Field::swap(Field field) {
     std::swap(cells, field.cells);
 }
 
-Universe::Field::Field(int width, int height) {
+Universe::Field::Field(std::size_t width, std::size_t height) {
     Field();
     setSize(width, height);
 }
 
-void Universe::Field::setSize(int width_arg, int height_arg) {
+void Universe::Field::setSize(std::size_t width_arg, std::size_t height_arg) {
     clear();
     cells.resize(height_arg);
     for (int i = 0; i < height_arg; i++) {
@@ -42,7 +42,7 @@ void Universe::Field::setSize(int width_arg, int height_arg) {
     height = height_arg;
 }
 
-bool Universe::Field::getCell(int x, int y) {
+bool Universe::Field::getCell(std::size_t x, std::size_t y) {
     if (x >= width || y >= height) {
         throw;
     }
@@ -50,7 +50,7 @@ bool Universe::Field::getCell(int x, int y) {
     return cells[y][x];
 }
 
-void Universe::Field::setCell(int x, int y, bool value) {
+void Universe::Field::setCell(std::size_t x, std::size_t y, bool value) {
     if (x >= width || y >= height) {
         throw;
     }
@@ -58,7 +58,7 @@ void Universe::Field::setCell(int x, int y, bool value) {
     cells[y][x] = value;
 }
 
-int Universe::Field::getCellNeighbours(int x, int y) {
+std::size_t Universe::Field::getCellNeighbours(std::size_t x, std::size_t y) {
     if (x >= width || y >= height) {
         throw;
     }
@@ -102,17 +102,14 @@ Universe::Universe() {
     curIteration = 0;
 }
 
-void Universe::setAliveCells(std::vector<std::pair<int, int>>& active_cells) {
-    std::cout << "size_of_field: " << getWidth() << " " << getHeight() << "\n";
+void Universe::setAliveCells(std::vector<std::pair<std::size_t, std::size_t>>& active_cells) {
     for (auto coords : active_cells) {
-        std::cout << "coords: " << coords.first << " " << coords.second << "\n";
         field.setCell(coords.first, coords.second);
     }
-    std::cout << "done setting!" << "\n";
 }
 
-std::vector<std::pair<int, int>> Universe::getAliveCells() {
-    std::vector<std::pair<int, int>> alive_cells;
+std::vector<std::pair<std::size_t, std::size_t>> Universe::getAliveCells() {
+    std::vector<std::pair<std::size_t, std::size_t>> alive_cells;
     for (int y = 0; y < heightOfField; y++) {
         for (int x = 0; x < widthOfField; x++) {
             if (field.getCell(x, y)) {
@@ -120,7 +117,6 @@ std::vector<std::pair<int, int>> Universe::getAliveCells() {
             }
         }
     }
-
     return alive_cells;
 }
 
@@ -169,23 +165,19 @@ std::array<bool, 9> Universe::getBirthRules() {
     return birthValues;
 }
 
-int Universe::getWidth() {
+std::size_t Universe::getWidth() {
     return widthOfField;
 }
 
-int Universe::getHeight() {
+std::size_t Universe::getHeight() {
     return heightOfField;
 }
 
-int Universe::getIteration() {
+std::size_t Universe::getIteration() {
     return curIteration;
 }
 
-void Universe::setSize(int width, int height) {
-    if (width < 0 || height < 0) {
-        throw;
-    }
-
+void Universe::setSize(std::size_t width, std::size_t height) {
     widthOfField = width;
     heightOfField = height;
 

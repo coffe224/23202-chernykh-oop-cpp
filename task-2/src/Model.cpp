@@ -1,28 +1,36 @@
 #include "Model.h"
 #include <iostream>
+#include <sstream>
 
-Model::Model() {std::cout << "get to model" << "\n";}
-
-void Model::initializeUniverse(std::string universe_name, std::string rules,
-                        int width_of_field, int height_of_field,
-                        std::vector<std::pair<int, int>> points)
+Model::Model(std::string universe_name, std::string rules, std::string sizes,
+             std::vector<std::string> string_points)
 {
-    std::cout << "setting size" << "\n";
-    universe.setSize(width_of_field, height_of_field);
-
-    std::cout << "setting rules" << "\n";
-    setRules(rules);
-    std::cout << "rules: " << getRules() << "\n";
-
-
-    std::cout << "setting name" << "\n";
     universe.setName(universe_name);
 
-    std::cout << "setting points" << "\n";
-    universe.setAliveCells(points);
+    try {
+        setRules(rules);
+    } catch (...) {
+        std::cerr << "Error: bad rules\n";
+        throw;
+    }
+
+    try {
+        setSize(sizes);
+    } catch (...) {
+        std::cerr << "Error: bad sizes\n";
+        throw;
+    }
+
+    try {
+        setPoints(string_points);
+    } catch (...) {
+        std::cerr << "Error: bad points\n";
+        throw;
+    }
 }
 
-void Model::setRules(std::string rules) {
+void Model::setRules(std::string rules)
+{
     if (rules.size() < 5 || rules.size() > 21) {
         throw;
     }
@@ -40,7 +48,7 @@ void Model::setRules(std::string rules) {
 
     std::array<bool, 9> birth_vals;
     birth_vals.fill(false);
-    for(char& c : birth_nums) {
+    for (char& c : birth_nums) {
         if (c < '0' || c > '8') {
             throw;
         }
@@ -54,7 +62,7 @@ void Model::setRules(std::string rules) {
 
     std::array<bool, 9> survival_vals;
     survival_vals.fill(false);
-    for(char& c : survival_nums) {
+    for (char& c : survival_nums) {
         if (c < '0' || c > '8') {
             throw;
         }
@@ -68,11 +76,10 @@ void Model::setRules(std::string rules) {
     universe.setRules(birth_vals, survival_vals);
 }
 
-std::string Model::getName() {
-    return universe.getName();
-}
+std::string Model::getName() { return universe.getName(); }
 
-std::string Model::getRules() {
+std::string Model::getRules()
+{
     std::array<bool, 9> survival_rules = universe.getSurvRules();
     std::array<bool, 9> birth_rules = universe.getBirthRules();
 
@@ -88,22 +95,47 @@ std::string Model::getRules() {
         }
     }
 
-    return "B" + birth_nums + "/S" + surv_nums; 
+    return "B" + birth_nums + "/S" + surv_nums;
 }
 
-std::pair<int, int> Model::getSize() {
+void Model::setSize(std::string string_sizes)
+{
+    std::pair<std::size_t, std::size_t> sizes = convert(string_sizes);
+    universe.setSize(sizes.first, sizes.second);
+}
+
+void Model::setPoints(std::vector<std::string>& string_points)
+{
+    std::vector<std::pair<std::size_t, std::size_t>> alive_points;
+    for (auto string_point : string_points) {
+        alive_points.push_back(convert(string_point));
+    }
+    universe.setAliveCells(alive_points);
+}
+
+std::pair<std::size_t, std::size_t> Model::convert(std::string string_pair)
+{
+    std::stringstream ss(string_pair);
+    std::pair<std::size_t, std::size_t> pair;
+    ss >> pair.first;
+    ss >> pair.second;
+    return pair;
+}
+
+std::pair<std::size_t, std::size_t> Model::getSize()
+{
     return {universe.getWidth(), universe.getHeight()};
 }
 
-int Model::getIteration() {
-    return universe.getIteration();
-}
+int Model::getIteration() { return universe.getIteration(); }
 
-std::vector<std::pair<int, int>> Model::getAliveCells() {
+std::vector<std::pair<std::size_t, std::size_t>> Model::getAliveCells()
+{
     return universe.getAliveCells();
 }
 
-std::vector<std::vector<bool>> Model::getCurrentField() {
+std::vector<std::vector<bool>> Model::getCurrentField()
+{
     return universe.getCurrentField();
 }
 

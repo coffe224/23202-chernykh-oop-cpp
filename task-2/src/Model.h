@@ -5,17 +5,15 @@
 class Model
 {
     public:
-        Model();
+        Model(std::string universe_name, std::string rules, std::string sizes,
+              std::vector<std::string> points);
 
         void iterate(int iterations = 1);
-        void initializeUniverse(std::string universe_name, std::string rules,
-                                int width_of_field, int height_of_field,
-                                std::vector<std::pair<int, int>> points);
-        
+
         std::string getName();
         std::string getRules();
-        std::pair<int, int> getSize();
-        std::vector<std::pair<int, int>> getAliveCells();
+        std::pair<std::size_t, std::size_t> getSize();
+        std::vector<std::pair<std::size_t, std::size_t>> getAliveCells();
         std::vector<std::vector<bool>> getCurrentField();
         int getIteration();
 
@@ -23,4 +21,8 @@ class Model
         Universe universe;
 
         void setRules(std::string rules);
+        void setPoints(std::vector<std::string>& string_points);
+        void setSize(std::string sizes);
+
+        std::pair<std::size_t, std::size_t> convert(std::string string_pair);
 };

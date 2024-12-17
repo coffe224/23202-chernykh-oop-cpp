@@ -6,36 +6,36 @@ class Universe
 {
     private:
         std::string universeName;
-        int widthOfField;
-        int heightOfField;
+        std::size_t widthOfField;
+        std::size_t heightOfField;
 
         std::array<bool, 9> birthValues;
         std::array<bool, 9> survivalValues;
 
-        std::vector<std::pair<int, int>> alive_cells;
+        std::vector<std::pair<std::size_t, std::size_t>> alive_cells;
 
-        int curIteration;
+        std::size_t curIteration;
 
         class Field
         {
             private:
-                int width;
-                int height;
+                std::size_t width;
+                std::size_t height;
                 std::vector<std::vector<bool>> cells;
 
             public:
                 Field();
                 ~Field();
 
-                Field(int width, int height);
+                Field(std::size_t width, std::size_t height);
                 void swap(Field field);
-                void setSize(int width, int height);
+                void setSize(std::size_t width, std::size_t height);
 
                 void clear();
 
-                void setCell(int x, int y, bool value = true);
-                bool getCell(int x, int y);
-                int getCellNeighbours(int x, int y);
+                void setCell(std::size_t x, std::size_t y, bool value = true);
+                bool getCell(std::size_t x, std::size_t y);
+                std::size_t getCellNeighbours(std::size_t x, std::size_t y);
 
                 std::vector<std::vector<bool>> getField();
         };
@@ -47,13 +47,14 @@ class Universe
         Universe();
         // ~Universe();
 
-        void setSize(int width,
-                     int height);
+        void setSize(std::size_t width,
+                     std::size_t height);
 
         void nextIteration();
 
-        int getWidth();
-        int getHeight();
+        std::size_t getWidth();
+        std::size_t getHeight();
+        std::size_t getIteration();
 
         void setName(std::string universe_name);
         std::string getName();
@@ -63,9 +64,8 @@ class Universe
 
         std::array<bool, 9> getSurvRules();
         std::array<bool, 9> getBirthRules();
-
-        int getIteration();
-        void setAliveCells(std::vector<std::pair<int, int>>& active_cells);
-        std::vector<std::pair<int, int>> getAliveCells();
+ 
+        void setAliveCells(std::vector<std::pair<std::size_t, std::size_t>>& active_cells);
+        std::vector<std::pair<std::size_t, std::size_t>> getAliveCells();
         std::vector<std::vector<bool>> getCurrentField();
 };
