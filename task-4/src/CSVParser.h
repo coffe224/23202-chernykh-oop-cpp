@@ -3,7 +3,7 @@
 #include <sstream>
 #include <tuple>
 
-#include "StreamParser.h"
+#include "StreamParser/StreamParser.h"
 
 template <typename... Args> class ParserIterator;
 
@@ -11,50 +11,53 @@ template <typename... Args> class CSVParser
 {
     public:
         CSVParser(std::ifstream& stream, std::size_t lines_to_skip)
-            : fileStream(stream), startLine(lines_to_skip)
+            : startLine(lines_to_skip), streamParser(stream, sizeof...(Args))
         {
+        }
+
+        void setSpecial(char escape_symb, char column_delim, char row_delim)
+        {
+            streamParser.setSpecialSymbols(escape_symb, column_delim,
+                                           row_delim);
         }
 
         ParserIterator<Args...> begin()
         {
-            std::cout << "Create begin\n";
-            return ParserIterator<Args...>(fileStream, startLine);
+            return ParserIterator<Args...>(streamParser, startLine);
         }
 
         ParserIterator<Args...> end()
         {
-            std::cout << "Create end\n";
-            return ParserIterator<Args...>(fileStream);
+            return ParserIterator<Args...>(streamParser);
         }
 
     private:
-        std::ifstream& fileStream;
+        StreamParser streamParser;
         std::size_t startLine;
 };
 
 template <typename... Args> class ParserIterator
 {
     public:
-        ParserIterator(std::ifstream& stream, std::size_t start_line)
-            : streamParser(stream, sizeof...(Args)), isBegIt(true)
+        ParserIterator(StreamParser& streamParser, std::size_t start_line)
+            : streamParser(streamParser), isBegIt(true)
         {
+            streamParser.reset();
             while (!isEndIt && (iCurRow < start_line)) {
                 ++(*this);
             }
             getRow();
         }
 
-        ParserIterator(std::ifstream& stream)
-            : streamParser(stream, sizeof...(Args)), isEndIt(true)
+        ParserIterator(StreamParser& streamParser)
+            : streamParser(streamParser), isEndIt(true)
         {
         }
 
         ParserIterator<Args...>& operator++()
         {
-            std::cout << "operator++()\n";
             getRow();
             iCurRow++;
-
             return *this;
         }
 
@@ -74,7 +77,6 @@ template <typename... Args> class ParserIterator
         ParserIterator<Args...>
         operator=(const ParserIterator<Args...>& second_it)
         {
-            std::cout << "Create parser by operator=\n";
             ParserIterator<Args...> new_it(this);
             return new_it;
         }
@@ -88,7 +90,7 @@ template <typename... Args> class ParserIterator
     private:
         std::size_t num_args = sizeof...(Args);
 
-        StreamParser streamParser;
+        StreamParser& streamParser;
 
         std::size_t iCurRow = 0;
         std::size_t iCurCol = 0;
@@ -98,29 +100,19 @@ template <typename... Args> class ParserIterator
         std::vector<std::string> curRow;
         std::tuple<Args...> resultTuple;
 
-        ParserIterator(const ParserIterator<Args...>& second_it)
-            : streamParser(second_it.streamParser)
-        {
-            std::cout << "Damn bro how did you get here\n";
-            if (!second_it.isBegIt) {
-                std::cerr << "Can only create copy of one object";
-                throw;
-            }
-
-            if (second_it.isEndIt) {
-                this->isEndIt = true;
-            } else {
-                this->iCurRow = second_it.iCurRow;
-                getRow();
-            }
-        }
-
         void getRow()
         {
             isEndIt = streamParser.isEOF();
 
             if (!isEndIt) {
-                curRow = streamParser.getRow();
+                try {
+                    curRow = streamParser.getRow();
+                } catch (std::length_error& e) {
+                    std::cerr
+                        << "ERROR: invalid number of columns in row number "
+                        << iCurRow + 1 << ": " << e.what() << "\n";
+                    throw e;
+                }
             }
         }
 
@@ -158,7 +150,7 @@ template <typename... Args> class ParserIterator
             if (ss.tellg() != -1) {
                 std::cerr << "ERROR: row " << iCurRow + 1 << ", column "
                           << iCurCol + 1 << "\n";
-                throw;
+                throw std::invalid_argument("Invalid file");
             }
 
             iCurCol++;

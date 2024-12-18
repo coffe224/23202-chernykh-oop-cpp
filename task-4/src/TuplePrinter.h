@@ -14,7 +14,7 @@ typename std::enable_if_t<M < sizeof...(Args), std::basic_ostream<Ch, Tr>&>
 {
     os << std::get<M>(t);
     if (M + 1 != sizeof...(Args)) {
-        os << " | ";
+        os << ", ";
     }
     return operator<<<M + 1, Ch, Tr, Args...>(os, t);
 }

@@ -12,6 +12,8 @@ class StreamParser
         std::vector<std::string> getRow();
         bool isEOF();
 
+        void reset();
+
         StreamParser(const StreamParser& second_sp);
 
     private:

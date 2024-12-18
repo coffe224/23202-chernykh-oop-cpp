@@ -8,7 +8,6 @@ StreamParser::StreamParser(std::ifstream& fileStream,
 
 std::vector<std::string> StreamParser::getRow()
 {
-    std::cerr << "getRow\n";
     std::vector<std::string> current_line = {};
 
     enum Mode { Inside, Default };
@@ -52,41 +51,43 @@ std::vector<std::string> StreamParser::getRow()
     current_line.push_back(word);
 
     if (numOfColumns != current_line.size()) {
-        // std::cerr << "On line " << line_index + 1 << " there are "
-        //           << current_line.size() << " columns instead of " <<
-        //           numOfColumns
-        //           << "\n";
-        std::cerr << "I want to die " << current_line.size() <<  " | " << numOfColumns << "\n";
-        throw;
+        std::string error_message = "expected " + std::to_string(numOfColumns) +
+                                    " columns, got " +
+                                    std::to_string(current_line.size());
+        throw std::length_error(error_message);
     }
 
     return current_line;
 }
 
+void StreamParser::reset()
+{
+    fileStream.clear();
+    fileStream.seekg(0);
+}
+
 bool StreamParser::isEOF() { return fileStream.peek() == EOF; }
 
-void StreamParser::setSpecialSymbols(char escape_symb, char column_delim, char row_delim)
+void StreamParser::setSpecialSymbols(char escape_symb, char column_delim,
+                                     char row_delim)
 {
     if (escape_symb == column_delim) {
-        std::cerr << "A";
+        std::cerr
+            << "Can't have the same escape character and column delimeter\n";
         throw;
     }
 
     if (escape_symb == row_delim) {
-        std::cerr << "B";
+        std::cerr << "Can't have the same escape character and row delimeter\n";
         throw;
     }
 
     if (column_delim == row_delim) {
-        std::cerr << "C";
+        std::cerr << "Can't have the same row delimeter and column delimeter\n";
         throw;
     }
-}
 
-StreamParser::StreamParser(const StreamParser& second_sp)
-    : StreamParser(second_sp.fileStream, second_sp.numOfColumns)
-{
-    this->escapeSymb = second_sp.escapeSymb;
-    this->rowDelim = second_sp.rowDelim;
-    this->columnDelim = second_sp.columnDelim;
+    escapeSymb = escape_symb;
+    columnDelim = column_delim;
+    rowDelim = row_delim;
 }
