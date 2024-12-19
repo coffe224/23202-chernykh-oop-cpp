@@ -2,8 +2,8 @@
 #include <string>
 #include <vector>
 
-#include "Controller.h"
-#include "ArgParser.h"
+#include "Controller/Controller.h"
+#include "ArgParser/ArgParser.h"
 
 
 int main(int argc, char const *argv[])
@@ -19,7 +19,6 @@ int main(int argc, char const *argv[])
     arg_parser.parseArguments(argc, argv);
 
     if (arg_parser.isEmpty()) {
-        std::cout << "get to controller" << "\n";
         controller.start();
         return 0;
     }
