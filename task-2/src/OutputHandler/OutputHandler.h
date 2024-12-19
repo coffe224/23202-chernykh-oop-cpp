@@ -6,6 +6,7 @@ class OutputHandler
 {
     public:
         void sendHelpMessage(std::string message = "");
+        void sendHelpMessageArgs(std::string message = "");
         void readyForInput();
         void dumpUniverse(UniverseWrapper* model, std::string output_filename);
         void printUniverse(UniverseWrapper* model);
@@ -18,6 +19,8 @@ class OutputHandler
             "\tdump <input_filename> - dump universe to file\n"
             "\ttick <n=1> | t <n=1> - iterate universe n times and prints it\n"
             "\tauto <n> - automatically iterate universe n times and prints it every iteration\n";
+
+        std::string helpMessageArgs = "placeholder\n";
 
 
         FileWriter fileWriter;

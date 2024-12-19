@@ -26,6 +26,10 @@ void Controller::start(std::string input_filename, std::string output_filename,
     outputHandler.dumpUniverse(model, output_filename);
 }
 
+void Controller::help(std::string message) {
+    outputHandler.sendHelpMessageArgs();
+}
+
 void Controller::gameLoop()
 {
     outputHandler.printUniverse(model);

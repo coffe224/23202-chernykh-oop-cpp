@@ -17,4 +17,6 @@ class Controller
         void start();
         void start(std::string input_filename);
         void start(std::string input_filename, std::string output_filename, int iterations);
+        
+        void help(std::string message = "");
 };

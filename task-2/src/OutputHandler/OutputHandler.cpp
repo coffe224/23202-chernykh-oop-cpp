@@ -11,6 +11,16 @@ void OutputHandler::sendHelpMessage(std::string message)
     std::cerr << helpMessage << "\n";
 }
 
+void OutputHandler::sendHelpMessageArgs(std::string message)
+{
+    std::cerr << "\n";
+    if (message != "") {
+        std::cerr << message << "\n"; 
+    }
+    std::cerr << helpMessageArgs << "\n";
+}
+
+
 void OutputHandler::readyForInput()
 {
     std::cerr << "> ";

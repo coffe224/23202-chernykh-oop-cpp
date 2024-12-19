@@ -24,14 +24,8 @@ int main(int argc, char const *argv[])
     }
 
     if (arg_parser.hasOpt("help")) { 
-        if (arg_parser.getOptArgs("help") != "") {
-            throw;
-        }
+        controller.help();
         return 0;
-    }
-
-    if (arg_parser.hasNoPosOptions()) {
-        return 1;
     }
 
     std::string input_filename = arg_parser.getPosOptArgs("input_filename")[0];
@@ -47,11 +41,12 @@ int main(int argc, char const *argv[])
         try {
             iterations = std::stoi(iterations_str);
         } catch (std::exception& e) {
+            std::cerr << "bad iterations number\n";
             return 1;
         }
-
         controller.start(input_filename, output_filename, iterations);
     } else {
+        std::cerr << "unknown command arguments, please read help\n";
         return 1;
     }
 }
