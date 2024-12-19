@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 
 #include "FileReaders/ByteReader.h"
@@ -9,5 +11,5 @@ class WavReader
         ByteReader byteReader;
 
     public:
-        WavFile read(std::string filename);
+        WavFile* read(std::string filename);
 };

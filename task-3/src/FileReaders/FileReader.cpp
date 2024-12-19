@@ -11,5 +11,7 @@ std::string FileReader::getLine()
         std::getline(file, line);
     } catch (...) {
         std::cerr << "ERROR: Can't get line from file '" << filename << "'.\n";
+        throw;
     }
+    return line;
 }

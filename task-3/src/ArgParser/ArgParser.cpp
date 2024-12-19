@@ -71,14 +71,31 @@ ArgParser::Option ArgParser::getOpt(char short_name)
     throw;
 }
 
-ArgParser::Option ArgParser::getOpt(std::string long_name)
+ArgParser::Option ArgParser::getOpt(std::string name)
 {
     for (auto option : options) {
-        if (option.longName == long_name) {
+        if (option.longName == name) {
             return option;
         }
     }
     throw;
+}
+
+bool ArgParser::hasOpt(std::string name)
+{
+    Option opt = getOpt(name);
+    bool is_in_opts = parsed_options.find(opt) != parsed_options.end();
+    return is_in_opts;
+}
+
+std::string ArgParser::getOptArgs(std::string name)
+{
+    Option opt = getOpt(name);
+    if (hasOpt(name)) {
+        return parsed_options[opt];
+    } else {
+        return "";
+    }
 }
 
 ArgParser::Option ArgParser::getPosOpt(std::string name)
@@ -89,6 +106,13 @@ ArgParser::Option ArgParser::getPosOpt(std::string name)
         }
     }
     throw;
+}
+
+bool ArgParser::hasPosOpt(std::string name)
+{
+    Option opt = getPosOpt(name);
+    bool is_in_opts = parsed_pos_options.find(opt) != parsed_pos_options.end();
+    return is_in_opts;
 }
 
 void ArgParser::parseLongOpt(std::string arg)

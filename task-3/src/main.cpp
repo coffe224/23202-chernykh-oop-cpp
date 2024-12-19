@@ -1,11 +1,12 @@
 #include <iostream>
 
-#include "ArgParser.h"
-#include "Controller.h"
+#include "ArgParser/ArgParser.h"
+#include "Controller/Controller.h"
 
 int main(int argc, char const *argv[])
 {
     ArgParser arg_parser;
+    Controller controller;
 
     arg_parser.addOption('h', "help", 0);
     arg_parser.addOption('c', "config", 1);
@@ -19,7 +20,7 @@ int main(int argc, char const *argv[])
         if (arg_parser.getOptArgs("help") != "") {
             throw;
         }
-        std::cout << "help message" << "\n";
+        controller.help();
         return 0;
     }
 
@@ -38,19 +39,10 @@ int main(int argc, char const *argv[])
     }
     std::string input_wav = arg_parser.getPosOptArgs("input_wav")[0];
 
-    std::vector<std::string> add_input_wavs =
-        arg_parser.getPosOptArgs("add_input_wavs");
+    std::vector<std::string> extra_wavs =
+        arg_parser.getPosOptArgs("extra_wavs");
 
-    std::cout << "config file: " << config_filename << "\n";
-    std::cout << "input wav: " << input_wav << "\n";
-    std::cout << "output wav: " << output_wav << "\n";
-    std::cout << "other input wavs: ";
-
-    for (auto file : add_input_wavs) {
-        std::cout << file << " ";
-    }
-    std::cout << "\n";
-
+    controller.start(config_filename, output_wav, {input_wav});
 
     return 0;
 }

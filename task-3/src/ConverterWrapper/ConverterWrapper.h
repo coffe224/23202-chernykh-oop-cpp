@@ -14,11 +14,11 @@ class ConverterWrapper
         virtual void initialize(Converter *converter_arg,
                                 std::vector<int> arguments = {}) = 0;
         virtual std::vector<int> requestWavFiles() = 0;
-        virtual void convert(WavFile wav_file,
-                             std::vector<WavFile> additional_wav_files) = 0;
+        virtual void convert(WavFile* wav_file,
+                             std::vector<WavFile*> additional_wav_files) = 0;
 };
 
-class SilencerWrapper : public ConverterWrapper
+class MuteWrapper : public ConverterWrapper
 {
     private:
         Converter *converter;
@@ -29,11 +29,11 @@ class SilencerWrapper : public ConverterWrapper
         void initialize(Converter *converter_arg,
                         std::vector<int> arguments = {});
         std::vector<int> requestWavFiles();
-        void convert(WavFile wav_file,
-                     std::vector<WavFile> additional_wav_files);
+        void convert(WavFile* wav_file,
+                     std::vector<WavFile*> additional_wav_files);
 };
 
-class MixerWrapper : public ConverterWrapper
+class MixWrapper : public ConverterWrapper
 {
     private:
         Converter *converter;
@@ -44,11 +44,11 @@ class MixerWrapper : public ConverterWrapper
         void initialize(Converter *converter_arg,
                         std::vector<int> arguments = {});
         std::vector<int> requestWavFiles();
-        void convert(WavFile wav_file,
-                     std::vector<WavFile> additional_wav_files);
+        void convert(WavFile* wav_file,
+                     std::vector<WavFile*> additional_wav_files);
 };
 
-class FaderWrapper : public ConverterWrapper
+class FadeWrapper : public ConverterWrapper
 {
     private:
         Converter *converter;
@@ -59,8 +59,8 @@ class FaderWrapper : public ConverterWrapper
         void initialize(Converter *converter_arg,
                         std::vector<int> arguments = {});
         std::vector<int> requestWavFiles();
-        void convert(WavFile wav_file,
-                     std::vector<WavFile> additional_wav_files);
+        void convert(WavFile* wav_file,
+                     std::vector<WavFile*> additional_wav_files);
 };
 
 class ConverterWrapperFactory
@@ -69,30 +69,21 @@ class ConverterWrapperFactory
         virtual ConverterWrapper* create(std::vector<std::string> config) = 0;
 };
 
-class SilencerWrapperFactory : public ConverterWrapperFactory
+class MuteWrapperFactory : public ConverterWrapperFactory
 {
     public:
         ConverterWrapper* create(std::vector<std::string> config);
 };
 
-class MixerWrapperFactory : public ConverterWrapperFactory
+class MixWrapperFactory : public ConverterWrapperFactory
 {
     public:
         ConverterWrapper* create(std::vector<std::string> config);
 };
 
-class FaderWrapperFactory : public ConverterWrapperFactory
+class FadeWrapperFactory : public ConverterWrapperFactory
 {
     public:
         ConverterWrapper* create(std::vector<std::string> config);
 };
 
-class ConverterManager
-{
-    public:
-        ConverterManager();
-        ConverterWrapperFactory *getConverter(std::string config_command);
-
-    private:
-        std::map<std::string, ConverterWrapperFactory *> factory_map;
-};

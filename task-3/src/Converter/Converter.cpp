@@ -1,4 +1,5 @@
 #include "Converter.h"
+#include <iostream>
 
 Sample Silencer::convert(std::vector<Sample> samples) {
     if (samples.size() != 1) {
@@ -19,8 +20,8 @@ Sample Mixer::convert(std::vector<Sample> samples) {
     Sample second_sample = samples[1];
 
     if (!first_sample.isEmpty() && !second_sample.isEmpty()) {
-        std::int16_t first_value = first_sample.getValue() / 2;
-        std::int16_t second_value = second_sample.getValue() / 2;
+        std::int16_t first_value = first_sample.getValue();
+        std::int16_t second_value = second_sample.getValue();
         first_sample.setValue(first_value + second_value);
     }
     return first_sample;
@@ -47,14 +48,3 @@ Sample Fader::convert(std::vector<Sample> samples) {
     return sample;
 }
 
-Converter* SilencerFactory::create(std::vector<int> params) {
-    return new Silencer;
-}
-
-Converter* MixerFactory::create(std::vector<int> params) {
-    return new Mixer;
-}
-
-Converter* FaderFactory::create(std::vector<int> params) {
-    return new Fader(params[0]);
-}

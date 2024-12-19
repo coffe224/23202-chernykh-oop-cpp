@@ -1,6 +1,7 @@
 #include "ConverterWrapper.h"
+#include <iostream>
 
-void SilencerWrapper::initialize(Converter *converter_arg,
+void MuteWrapper::initialize(Converter *converter_arg,
                                  std::vector<int> arguments)
 {
     if (arguments.size() != 2) {
@@ -11,31 +12,32 @@ void SilencerWrapper::initialize(Converter *converter_arg,
     endTime = arguments[1];
 }
 
-std::vector<int> SilencerWrapper::requestWavFiles() { return {}; }
+std::vector<int> MuteWrapper::requestWavFiles() { return {}; }
 
-void SilencerWrapper::convert(WavFile wav_file,
-                              std::vector<WavFile> additional_wav_files)
+void MuteWrapper::convert(WavFile* wav_file,
+                              std::vector<WavFile*> additional_wav_files)
 {
-    wav_file.open();
+    wav_file->open();
     if (additional_wav_files.size() != 0) {
         throw;
     }
 
-    wav_file.seek(beginningTime);
-    while (wav_file.tell() != endTime) {
-        Sample sample = wav_file.get();
+    wav_file->seek(beginningTime * 44100);
+    while (wav_file->tell() != endTime * 44100) {
+        Sample sample = wav_file->get();
         if (sample.isEmpty()) {
             break;
         }
 
         Sample converted_sample = (*converter).convert({sample});
-        wav_file.set(converted_sample);
-        wav_file.next();
+
+        wav_file->set(converted_sample);
+        wav_file->next();
     }
-    wav_file.close();
+    wav_file->close();
 }
 
-void MixerWrapper::initialize(Converter *converter_arg,
+void MixWrapper::initialize(Converter *converter_arg,
                               std::vector<int> arguments)
 {
     if (arguments.size() != 2) {
@@ -47,33 +49,33 @@ void MixerWrapper::initialize(Converter *converter_arg,
     converter = converter_arg;
 }
 
-std::vector<int> MixerWrapper::requestWavFiles() { return {indexWavFile}; }
+std::vector<int> MixWrapper::requestWavFiles() { return {indexWavFile}; }
 
-void MixerWrapper::convert(WavFile wav_file,
-                           std::vector<WavFile> additional_wav_files)
+void MixWrapper::convert(WavFile* wav_file,
+                           std::vector<WavFile*> additional_wav_files)
 {
     if (additional_wav_files.size() != 1) {
         throw;
     }
 
-    wav_file.seek(beginningTime);
-    WavFile mix_wav_file = additional_wav_files[0];
-    mix_wav_file.seek(0);
+    wav_file->seek(beginningTime);
+    WavFile* mix_wav_file = additional_wav_files[0];
+    mix_wav_file->seek(0);
 
     while (true) {
-        Sample sample = wav_file.get();
-        Sample mix_sample = mix_wav_file.get();
+        Sample sample = wav_file->get();
+        Sample mix_sample = mix_wav_file->get();
 
         if (sample.isEmpty() || mix_sample.isEmpty()) {
             break;
         }
 
         Sample converted_sample = (*converter).convert({sample, mix_sample});
-        wav_file.set(converted_sample);
+        wav_file->set(converted_sample);
     }
 }
 
-void FaderWrapper::initialize(Converter *converter_arg,
+void FadeWrapper::initialize(Converter *converter_arg,
                               std::vector<int> arguments)
 {
     if (arguments.size() != 2) {
@@ -84,30 +86,30 @@ void FaderWrapper::initialize(Converter *converter_arg,
     endTime = arguments[1];
 }
 
-std::vector<int> FaderWrapper::requestWavFiles() { return {}; }
+std::vector<int> FadeWrapper::requestWavFiles() { return {}; }
 
-void FaderWrapper::convert(WavFile wav_file,
-                           std::vector<WavFile> additional_wav_files)
+void FadeWrapper::convert(WavFile* wav_file,
+                           std::vector<WavFile*> additional_wav_files)
 {
     if (additional_wav_files.size() != 0) {
         throw;
     }
 
-    wav_file.seek(beginningTime);
-    while (wav_file.tell() != endTime) {
-        Sample sample = wav_file.get();
+    wav_file->seek(beginningTime);
+    while (wav_file->tell() != endTime) {
+        Sample sample = wav_file->get();
         if (sample.isEmpty()) {
             break;
         }
 
         Sample converted_sample = (*converter).convert({sample});
-        wav_file.set(converted_sample);
-        wav_file.next();
+        wav_file->set(converted_sample);
+        wav_file->next();
     }
 }
 
 ConverterWrapper *
-SilencerWrapperFactory::create(std::vector<std::string> config)
+MuteWrapperFactory::create(std::vector<std::string> config)
 {
     if (config.size() != 3) {
         throw;
@@ -120,7 +122,7 @@ SilencerWrapperFactory::create(std::vector<std::string> config)
     int beginning_seconds = std::stoi(config[1]);
     int end_seconds = std::stoi(config[2]);
 
-    ConverterWrapper *converter_wrapper = new SilencerWrapper;
+    ConverterWrapper *converter_wrapper = new MuteWrapper;
 
     SilencerFactory factory;
     Converter *converter = factory.create();
@@ -129,7 +131,7 @@ SilencerWrapperFactory::create(std::vector<std::string> config)
     return converter_wrapper;
 }
 
-ConverterWrapper *MixerWrapperFactory::create(std::vector<std::string> config)
+ConverterWrapper *MixWrapperFactory::create(std::vector<std::string> config)
 {
     if (config.size() < 2 || config.size() > 3) {
         throw;
@@ -146,7 +148,7 @@ ConverterWrapper *MixerWrapperFactory::create(std::vector<std::string> config)
         beginning_seconds = std::stoi(config[2]);
     }
 
-    ConverterWrapper *converter_wrapper = new MixerWrapper;
+    ConverterWrapper *converter_wrapper = new MixWrapper;
 
     MixerFactory factory;
     Converter *converter = factory.create();
@@ -155,7 +157,7 @@ ConverterWrapper *MixerWrapperFactory::create(std::vector<std::string> config)
     return converter_wrapper;
 }
 
-ConverterWrapper *FaderWrapperFactory::create(std::vector<std::string> config)
+ConverterWrapper *FadeWrapperFactory::create(std::vector<std::string> config)
 {
     if (config.size() != 3) {
         throw;
@@ -168,30 +170,11 @@ ConverterWrapper *FaderWrapperFactory::create(std::vector<std::string> config)
     int beginning_seconds = std::stoi(config[1]);
     int end_seconds = std::stoi(config[2]);
 
-    ConverterWrapper *converter_wrapper = new FaderWrapper;
+    ConverterWrapper *converter_wrapper = new FadeWrapper;
 
     FaderFactory factory;
-    Converter *converter = factory.create({end_seconds - beginning_seconds});
+    Converter *converter = factory.create({(end_seconds - beginning_seconds)});
 
     converter_wrapper->initialize(converter, {beginning_seconds, end_seconds});
     return converter_wrapper;
-}
-
-ConverterManager::ConverterManager()
-{
-    factory_map = {
-        {"mute", new SilencerWrapperFactory},
-        {"mix", new MixerWrapperFactory},
-        {"fade", new FaderWrapperFactory},
-    };
-}
-
-ConverterWrapperFactory* ConverterManager::getConverter(std::string config_command)
-{
-    auto pos = factory_map.find(config_command);
-    if (pos == factory_map.end()) {
-        throw;
-    } else {
-        return pos->second;
-    }
 }

@@ -8,12 +8,15 @@ class WavFile
     private:
         std::string fileName;
         std::fstream file;
+        std::size_t index = 0;
 
-        std::uint16_t getSampleValue();
-        void setSampleValue(std::uint16_t value);
+        std::int16_t getSampleValue();
+        void setSampleValue(std::int16_t value);
         
     public:
         WavFile(std::string filename);
+        WavFile(WavFile* wav_file, std::string filename);
+
         void open();
         bool isOpen();
         bool isEOF();

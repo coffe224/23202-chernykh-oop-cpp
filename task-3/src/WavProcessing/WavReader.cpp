@@ -1,7 +1,7 @@
 #include "WavReader.h"
 #include <iostream>
 
-WavFile WavReader::read(std::string filename)
+WavFile* WavReader::read(std::string filename)
 {
     byteReader.open(filename);
 
@@ -108,10 +108,10 @@ WavFile WavReader::read(std::string filename)
         throw;
     }
 
-    WavFile wavFile(filename);
-    wavFile.start_position = 44;
-    wavFile.sample_rate = sample_rate;
-    wavFile.samples = num_of_samples;
+    WavFile* wavFile = new WavFile(filename);
+    wavFile->start_position = 44;
+    wavFile->sample_rate = sample_rate;
+    wavFile->samples = num_of_samples;
 
 
     return wavFile;

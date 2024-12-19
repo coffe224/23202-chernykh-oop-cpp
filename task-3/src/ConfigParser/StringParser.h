@@ -4,7 +4,7 @@
 class StringParser
 {
     public:
-        std::vector<std::string> getWords(std::string& line, const char delim = ' ');
+        std::vector<std::string> getWords(std::string line, const char delim = ' ');
 
     private:
         char delim;

@@ -1,6 +1,6 @@
 #include "StringParser.h"
 
-std::vector<std::string> StringParser::getWords(std::string& line, const char delimeter)
+std::vector<std::string> StringParser::getWords(std::string line, const char delimeter)
 {
     delim = delimeter;
     std::vector<std::string> parsed_words;
